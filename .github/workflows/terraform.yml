@@ -3,21 +3,23 @@ name: Terraform CI/CD
 on:
   push:
     branches:
-      - main  # Trigger on changes to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull requests to the main branch
+      - main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write  # Add permission for id-token
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 1. Log in to Azure using Service Principal
-    - name: Set up Azure CLI
+    - name: Log in to Azure
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -25,18 +27,14 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # 2. Set up Terraform
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
 
-    # 3. Run terraform init to initialize the Terraform working directory
     - name: Terraform Init
       run: terraform init
 
-    # 4. Run terraform plan to see the changes Terraform will make
     - name: Terraform Plan
       run: terraform plan
 
-    # 5. Apply Terraform changes to your Azure subscription
     - name: Terraform Apply
       run: terraform apply -auto-approve
