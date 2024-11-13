@@ -16,19 +16,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # 1. Log in to Azure using Service Principal
+    - name: Set up Azure CLI
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # 2. Set up Terraform
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
 
+    # 3. Run terraform init to initialize the Terraform working directory
     - name: Terraform Init
       run: terraform init
 
+    # 4. Run terraform plan to see the changes Terraform will make
     - name: Terraform Plan
       run: terraform plan
 
+    # 5. Apply Terraform changes to your Azure subscription
     - name: Terraform Apply
       run: terraform apply -auto-approve
-      env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
