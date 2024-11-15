@@ -8,6 +8,10 @@ on:
     branches:
       - main  # Trigger on pull requests to the main branch
 
+permissions:  # Add this section
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
