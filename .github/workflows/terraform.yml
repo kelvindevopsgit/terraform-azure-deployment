@@ -16,11 +16,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Logout from Azure CLI (ensure no conflict)
-        run: az logout
-
       - name: Login to Azure using Service Principal
-        uses: azure/login@v2  # You can try v2 for better handling
+        uses: azure/login@v2  # Use version v2 for improved handling
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}  # Service Principal credentials in JSON format
           auth-type: SERVICE_PRINCIPAL
