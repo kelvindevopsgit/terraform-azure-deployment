@@ -33,3 +33,8 @@ variable "key_vault_name" {
   description = "Name of the Key Vault."
   type        = string
 }
+
+variable "subscription_id" {}
+variable "client_id" {}
+variable "client_secret" {}
+variable "tenant_id" {}
