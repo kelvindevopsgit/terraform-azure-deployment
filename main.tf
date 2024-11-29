@@ -10,7 +10,13 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  subscription_id = getenv("ARM_SUBSCRIPTION_ID")
+  client_id       = getenv("ARM_CLIENT_ID")
+  client_secret   = getenv("ARM_CLIENT_SECRET")
+  tenant_id       = getenv("ARM_TENANT_ID")
 }
+
 
 # Data resource for tenant ID
 data "azurerm_client_config" "current" {}
