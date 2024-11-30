@@ -10,27 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read  # Default permission
+      contents: read  # Default permission for repository contents
 
     steps:
-      # Checkout the repository code
+      # Checkout the code from the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
       # Login to Azure using Service Principal
       - name: Login to Azure using Service Principal
-        uses: azure/login@v2
+        uses: azure/login@v2  # Use version v2 for improved handling
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Use the credentials stored in GitHub secrets
+          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Service Principal credentials in JSON format
+          auth-type: SERVICE_PRINCIPAL
 
-      # Initialize Terraform (this automatically uses the Azure credentials set by the login action)
-      - name: Terraform Init
-        run: terraform init
+      # Set Azure Credentials for Terraform and Initialize Terraform with Backend Configuration
+      - name: Terraform Init (with backend config)
+        run: |
+          terraform init \
+            -backend-config="subscription_id=${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}" \
+            -backend-config="client_id=${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}" \
+            -backend-config="client_secret=${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}" \
+            -backend-config="tenant_id=${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}"
 
-      # Run Terraform Plan (optional but useful for debugging)
-      - name: Terraform Plan
-        run: terraform plan
-
-      # Apply Terraform changes
+      # Run Terraform Apply with Credentials explicitly passed
       - name: Terraform Apply
+        env:
+          ARM_CLIENT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+          ARM_CLIENT_SECRET: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+          ARM_SUBSCRIPTION_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
+          ARM_TENANT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}
         run: terraform apply -auto-approve
